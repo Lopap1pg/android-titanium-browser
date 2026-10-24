@@ -291,14 +291,7 @@ forward_state = '''    private void updateTitaniumForwardAction() {
         boolean canGoForward = tab != null && tab.canGoForward();
         forwardModel.set(
                 ActionProperties.ON_PRESS_CALLBACK,
-                canGoForward
-                        ? view -> {
-                            Tab currentTab = mActivityTabProvider.get();
-                            if (currentTab != null && currentTab.canGoForward()) {
-                                currentTab.goForward();
-                            }
-                        }
-                        : null);
+                canGoForward ? view -> mToolbarTabController.forward() : null);
     }
 
     private void onBackPressStateChanged() {
