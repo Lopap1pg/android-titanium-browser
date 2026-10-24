@@ -247,10 +247,8 @@ block = '''        mLocationBar.addOmniboxSuggestionsDropdownScrollListener(mSta
 
         if (mActionRegistry != null) {
             PropertyModel panelModel = mActionRegistry.get(ActionId.TITANIUM_PANEL).get();
-            PropertyModel forwardModel = mActionRegistry.get(ActionId.TITANIUM_FORWARD).get();
             PropertyModel searchModel = mActionRegistry.get(ActionId.TITANIUM_SEARCH).get();
             assert panelModel != null : "TITANIUM_PANEL action should be registered";
-            assert forwardModel != null : "TITANIUM_FORWARD action should be registered";
             assert searchModel != null : "TITANIUM_SEARCH action should be registered";
 
             panelModel.set(
@@ -262,19 +260,49 @@ block = '''        mLocationBar.addOmniboxSuggestionsDropdownScrollListener(mSta
                                 .showBookmarkManager(mActivity, tab, tab.getProfile());
                     });
 
-            forwardModel.set(
-                    ActionProperties.ON_PRESS_CALLBACK,
-                    view -> {
-                        Tab tab = mActivityTabProvider.get();
-                        if (tab != null && tab.canGoForward()) tab.goForward();
-                    });
-
             searchModel.set(
                     ActionProperties.ON_PRESS_CALLBACK,
                     view ->
                             beginFuseboxInput(
                                     new AutocompleteInput(OmniboxFocusReason.OMNIBOX_TAP)));
+
+            updateTitaniumForwardAction();
         }
 
 '''
 replace_once(toolbar_manager, anchor, block)
+
+# Forward shares the browser's navigation-state update path. A null callback is
+# intentionally used when there is no forward history: ActionButtonBinder turns
+# that into the normal disabled button appearance and non-clickable state.
+back_state = '''    private void onBackPressStateChanged() {
+        Tab tab = mActivityTabProvider.get();
+        mBackPressStateSupplier.set(tab != null && mToolbarTabController.canGoBack());
+    }
+'''
+forward_state = '''    private void updateTitaniumForwardAction() {
+        if (mActionRegistry == null) return;
+        PropertyModel forwardModel = mActionRegistry.get(ActionId.TITANIUM_FORWARD).get();
+        if (forwardModel == null) return;
+
+        Tab tab = mActivityTabProvider.get();
+        boolean canGoForward = tab != null && tab.canGoForward();
+        forwardModel.set(
+                ActionProperties.ON_PRESS_CALLBACK,
+                canGoForward
+                        ? view -> {
+                            Tab currentTab = mActivityTabProvider.get();
+                            if (currentTab != null && currentTab.canGoForward()) {
+                                currentTab.goForward();
+                            }
+                        }
+                        : null);
+    }
+
+    private void onBackPressStateChanged() {
+        updateTitaniumForwardAction();
+        Tab tab = mActivityTabProvider.get();
+        mBackPressStateSupplier.set(tab != null && mToolbarTabController.canGoBack());
+    }
+'''
+replace_once(toolbar_manager, back_state, forward_state)
