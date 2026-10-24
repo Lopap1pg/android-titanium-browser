@@ -59,7 +59,9 @@ replace_once(
 )
 
 # ---------------------------------------------------------------------------
-# Register visual models. Existing Chromium resources are intentionally reused.
+# Register visual models. Existing resources from ActionUtils' direct resource
+# dependencies are intentionally reused so the actions target needs no new
+# resource package.
 # ---------------------------------------------------------------------------
 action_utils = Path(
     "chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionUtils.java"
@@ -80,7 +82,7 @@ replace_once(
     "                registry,\n"
     "                ActionId.TITANIUM_FORWARD,\n"
     "                ActionProperties.BASE_KEYS,\n"
-    "                R.drawable.btn_forward,\n"
+    "                R.drawable.ic_arrow_forward_accent1_24dp,\n"
     "                R.string.accessibility_toolbar_btn_forward,\n"
     "                R.string.accessibility_toolbar_btn_forward);\n\n"
     "        // Register Titanium search button.\n"
