@@ -82,7 +82,7 @@ replace_once(
     "                registry,\n"
     "                ActionId.TITANIUM_FORWARD,\n"
     "                ActionProperties.BASE_KEYS,\n"
-    "                R.drawable.ic_arrow_forward_accent1_24dp,\n"
+    "                R.drawable.btn_forward,\n"
     "                R.string.accessibility_toolbar_btn_forward,\n"
     "                R.string.accessibility_toolbar_btn_forward);\n\n"
     "        // Register Titanium search button.\n"
